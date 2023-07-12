@@ -449,7 +449,7 @@ for idj = 1:length(ids)
     if withplots, semilogy(c8); end
 
 
-	%% Sketch and select Arnoldi (greedy) - from NATARAJA paper
+	%% Sketch and select Arnoldi (greedy) - from NATARAJAN paper
 	fprintf('\nsketch and select Arnoldi (greedy)\t|')
 	cnd = [];
 	jmax_ok = 0;
@@ -473,7 +473,7 @@ for idj = 1:length(ids)
 		H(:,j) = 0;
 
 		% get indices via greedy
-		% see NATARAJA paper
+		% see NATARAJAN paper
 		ind = [];
 		SV1 = SV; sw1 = sw;
 		for it = 1:min(j, t)
