@@ -2,7 +2,7 @@
 
 Contains the MATLAB scripts to reproduce all the figures in [1]. 
 
-The code includes the ssget interface to access the SuiteSparse Matrix Collection and a function to compute the SRHT from Oleg Balabanov's randKrylov repository (https://github.com/obalabanov/randKrylov).
+The code includes the ssget interface by Timothy A. Davis to access the SuiteSparse Matrix Collection, a function to compute the SRHT from Oleg Balabanov's randKrylov repository (https://github.com/obalabanov/randKrylov), and a function to plot performance profiles from Nick Higham's matlab-guide-3ed repository (https://github.com/higham/matlab-guide-3ed).
 
 ### References 
 
