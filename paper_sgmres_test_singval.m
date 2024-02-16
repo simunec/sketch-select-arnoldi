@@ -1,6 +1,5 @@
 
 % Tests convergence of sGMRES related to basis condition number and singular values
-% Compares a lot of methods
 
 clear all
 close all
@@ -15,9 +14,9 @@ nids = length(ids);
 load("ids_selected.mat");
 
 % for idj = 1:length(ids)
-for idj = [46, 43]		
-    
-    close all
+for idj = [46, 43, 53]
+
+	close all    
 
     Prob = ssget(ids(idj));
     fprintf('\nPROBLEM %s (%d of %d)\n', Prob.name, idj, length(ids));
@@ -32,13 +31,13 @@ for idj = [46, 43]
     
     b = b/norm(b);
     x0 = zeros(n,1);
-    m = 300;
+    m = 400;
     every = 5;
+    
 	t = 5;
     s = 2*(m+1);
     rng('default')
     hS = srhtb2(n, s);
-
 
     %% standard Arnoldi
     fprintf('\nstandard Arnoldi\t|')
@@ -60,7 +59,7 @@ for idj = [46, 43]
         end
         H1(j+1,j) = norm(w);
         V1(:,j+1) = w/H1(j+1,j);
-    
+        
         if ~mod(j,every)
             coeffs = H1(1:j+1,1:j)\eye(j+1,1);
             x = V1(:,1:j)*coeffs;
@@ -72,7 +71,6 @@ for idj = [46, 43]
 	m2 = floor(m/2);
 	sing1 = svd(V1);
 	singhalf1 = svd(V1(:, 1:m2));
-    
 
     %% truncated Arnoldi
     fprintf('\ntruncated Arnoldi\t|')
@@ -94,7 +92,7 @@ for idj = [46, 43]
         H2(j+1,j) = norm(w);
         V2(:,j+1) = w/H2(j+1,j);
         SV2(:,j+1) = hS(V2(:,j+1));
-
+    
 		% Compute solution with QR factorization instead of pinv:
 		if ~mod(j,every)
 			[U, T] = qr(SAV2(:, 1:j), 0);
@@ -132,7 +130,7 @@ for idj = [46, 43]
         H3(j+1,j) = norm(sw);
         V3(:,j+1) = w/H3(j+1,j);
         SV3(:,j+1) = sw/H3(j+1,j);
-    
+
 		% Compute solution with QR factorization instead of pinv:
 		if ~mod(j,every)
 			[U, T] = qr(SAV3(:, 1:j), 0);
@@ -146,7 +144,6 @@ for idj = [46, 43]
 	sing3 = svd(V3);
 	singhalf3 = svd(V3(:, 1:m2));
 
-
 	%% ssa with OMP
     fprintf('\nssa with OMP\t\t|')
 	V4 = b;	AV4 = [];
@@ -155,7 +152,7 @@ for idj = [46, 43]
 	SV4 = hS(V4); SAV4 = []; Sb = hS(b);
 	nsw = norm(SV4);
 	SV4 = SV4/nsw;	V4 = V4/nsw;
-	res4 = [];	cnd4 = [];	
+	res4 = [];	cnd4 = [];
 	for j = 1:m
 		if ~mod(j, every)
 			fprintf('.')
@@ -203,7 +200,6 @@ for idj = [46, 43]
 	m2 = floor(m/2);
 	sing4 = svd(V4);
 	singhalf4 = svd(V4(:, 1:m2));
-
 
     %% sketch-and-select Arnoldi SP
     fprintf('\nssa with SP\t\t|')
@@ -267,7 +263,6 @@ for idj = [46, 43]
 	sing7 = svd(V7);
 	singhalf7 = svd(V7(:, 1:m2));
 
-
 	%% sketch-and-select with Greedy (Natarajan)
     fprintf('\nssa with greedy\t\t|')
 	V8 = b;	AV8 = [];
@@ -276,7 +271,7 @@ for idj = [46, 43]
 	SV8 = hS(V8); SAV8 = []; Sb = hS(b);
 	nsw = norm(SV8);
 	SV8 = SV8/nsw;	V8 = V8/nsw;
-	res8 = [];	cnd8 = [];	
+	res8 = [];	cnd8 = [];
 	for j = 1:m
 		if ~mod(j, every)
 			fprintf('.')
@@ -337,9 +332,9 @@ for idj = [46, 43]
 	semilogy(iters, res8,':');
 	xlabel("$m$");
 	ylabel("residual");
-	xlim([-5, 305]);
-	ylim([1e-11, 1e1]);
-	yticks([1e-10 1e-5 1]);
+	xlim([-5, m+5]);
+	ylim([1e-16, 1e1]);
+	yticks([1e-15 1e-10 1e-5 1]);
 
 	subplot(2, 2, 2);
 	semilogy(iters, cnd1); hold on;
@@ -350,7 +345,7 @@ for idj = [46, 43]
 	semilogy(iters, cnd8,':');
 	xlabel("$m$");
 	ylabel("cond$(V_m)$");
-	xlim([-5, 305]);
+	xlim([-5, m+5]);
 	ylim([1e-1 1e18]);
 	yticks([1e0, 1e5, 1e10, 1e15])
 
@@ -362,8 +357,8 @@ for idj = [46, 43]
 	semilogy(sing7,':');
 	semilogy(sing8,':');
 	xlabel("$j$");
-	ylabel("$\sigma_j(V_{300})$");
-	xlim([-5, 305]);
+	ylabel("$\sigma_j(V_{400})$");
+	xlim([-5, m+5]);
 	ylim([1e-17, 1e1]);
 	yticks([1e-15, 1e-10, 1e-5, 1]);
 
@@ -375,12 +370,12 @@ for idj = [46, 43]
 	semilogy(singhalf7,':');
 	semilogy(singhalf8,':');
 	xlabel("$j$");
-	ylabel("$\sigma_j(V_{150})$");
-	xlim([-2.5, 152.5]);
+	ylabel("$\sigma_j(V_{200})$");
+	xlim([-2.5, floor(m/2)+2.5]);
 	ylim([1e-17, 1e1]);
 	yticks([1e-15, 1e-10, 1e-5, 1]);
 	legend('GMRES', 'sGMRES-truncated', 'sGMRES-ssa-pinv', 'sGMRES-ssa-OMP', 'sGMRES-ssa-SP', 'sGMRES-ssa-greedy', 'Location','southwest');
-	fname = sprintf('ssa_plots/paper_singval_mat%d-t%d',idj, t);
+	fname = sprintf('ssa_plots/test_singval_m%d-mat%d-t%d', m, idj, t);
     mypdf(fname, 0.6, 1)
 	
 end % next problem
